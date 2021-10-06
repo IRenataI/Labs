@@ -1,0 +1,136 @@
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main()
+{
+    setlocale(LC_ALL, "RUS");
+
+    float A, B, C, C1, B1, A1;
+
+    //Задание 1
+
+
+    cout << "Введите A" << endl;
+    cin >> A;
+    cout << "Введите B" << endl;
+    cin >> B;
+
+    cout << "\nSWAP\n" << endl;
+    swap(A, B);
+
+    cout << "A = " << A << endl;
+    cout << "B = " << B << endl;
+
+    //Задание 2
+
+    cout << "===========================================" << endl;
+
+    cout << "Введите A" << endl;
+    cin >> A;
+    cout << "Введите B" << endl;
+    cin >> B;
+    cout << "Введите C" << endl;
+    cin >> C;
+
+    A1 = A;
+    B1 = B;
+    C1 = C;
+
+    B = A1;
+    C = B1;
+    A = C1;
+
+
+    cout << "\nSWAP\n" << endl;
+
+    cout << "A = " << A << endl;
+    cout << "B = " << B << endl;
+    cout << "C = " << C << endl;
+
+    //Задание 3
+
+    cout << "===========================================" << endl;
+
+    cout << "Введите A" << endl;
+    cin >> A;
+    cout << "Введите B" << endl;
+    cin >> B;
+    cout << "Введите C" << endl;
+    cin >> C;
+
+    A1 = A;
+    B1 = B;
+    C1 = C;
+
+    B = C1;
+    C = A1;
+    A = B1;
+
+
+    cout << "\nSWAP\n" << endl;
+
+    cout << "A = " << A << endl;
+    cout << "B = " << B << endl;
+    cout << "C = " << C << endl;
+
+    //Задание 4
+
+    cout << "===========================================" << endl;
+
+    float x,y;
+
+    cout << "y = 3x^6-6x^2-7" << endl;
+
+    cout << "Введите x" << endl;
+    cin >> x;
+
+    y = 3 * pow(x, 6) - 6 * pow(x, 2) - 7;
+
+    cout << "y = " << y << endl;
+   
+    //Задание 5
+
+    cout << "===========================================" << endl;
+
+
+    cout << "y = 4(x-3)^6-7(x-3)^3+2 " << endl;
+
+    cout << "Введите x" << endl;
+    cin >> x;
+
+    y = 4*pow((x-3),6) - 7*pow((x-3),3) + 2;
+
+    cout << "y = " << y << endl;
+
+    //Задание 6
+
+    cout << "===========================================" << endl;
+
+    cout << "Введите A" << endl;
+    cin >> A;
+
+    float Ap1;
+
+    Ap1 = A * A;
+
+    cout << A << "^8 = " << Ap1 * Ap1 * Ap1 * Ap1 << endl;
+
+    //Задание 7
+
+    cout << "===========================================" << endl;
+
+    cout << "Введите A" << endl;
+    cin >> A;
+
+    float Ap2;
+
+    Ap1 = A * A * A * A * A;
+    Ap2 = A * A;
+
+    cout << A << "^15 = " << Ap2 * Ap2 * Ap2 * Ap2 * Ap2 * Ap1 << endl;
+
+
+
+}
