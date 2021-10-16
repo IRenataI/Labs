@@ -131,6 +131,15 @@ int main()
 
     x = step2 / step1;
     y = step3 / step1;
+    
+     if (x == -0.00)
+    {
+        x = 0;
+    }
+    if (y == -0.00)
+    {
+        y = 0;
+    }
 
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
