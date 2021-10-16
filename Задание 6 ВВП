@@ -131,6 +131,6 @@ int main()
 
     cout << A << "^15 = " << Ap2 * Ap2 * Ap2 * Ap2 * Ap2 * Ap1 << endl;
 
-
+    return 0;
 
 }
