@@ -14,7 +14,7 @@ int main()
 	cout << "Введите целое положительное число B (B>A)" << endl;
 	cin >> B;
 
-	for (int i = B - 1; i > A; --i)
+	for (int i = B - 1; i > A; i--)
 	{
 		for (int j = 0; j < i; j++)
 		{
