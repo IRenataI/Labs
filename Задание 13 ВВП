@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ int main()
 	cout << "Введите цену за килограмм:" << endl;
 	cin >> a;
 
-	for (float i = 0.1; i < 1.1; i += 0.1) 
+	for (float i = 0.1; i < 1.1; i += 0.1)
 	{
 		cout << "Цена за " << i << " кг конфет = " << a * i << " (руб)" << endl;
 	}
@@ -30,7 +31,7 @@ int main()
 		r = r * i;
 		i = i + 0.1;
 	}
-	
+
 	cout << "Произведение N сомножителей = " << r << endl;
 
 	cout << "=================================================" << endl;
@@ -83,13 +84,20 @@ int main()
 	cin >> N;
 
 	r = 1;
-	A2 = 1;
 
-	for (int i = 2; i <= N; i++)
+	float Amin = 0, Apls = 0;
+
+	for (int i = 1; i <= N; i+=2)
 	{
-		A2 = A2 * -A;
-		r = r + A2;
+		Amin += pow(A, i);
 	}
-	cout << "1 - A + A^2 - A^3 + . . . +- A^N = " << r << endl;
+
+	for (int i = 2; i <= N; i += 2)
+	{
+		Apls += pow(A, i);
+	}
+
+
+	cout << "1 - A + A^2 - A^3 + . . . +- A^N = " << (float)(r - Amin + Apls) << endl;
 
 }
