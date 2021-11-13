@@ -66,7 +66,7 @@ int main()
 	float A2 = 1;
 	r = 1;
 
-	for (int i = 2; i <= N; ++i)
+	for (int i = 2; i <= N; i++)
 	{
 		A2 = A2 * A;
 		r = r + A2;
