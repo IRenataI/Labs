@@ -3,59 +3,59 @@ using namespace std;
 int main() {
     int n;
     char c;
-    cout << "Enter the initial direction" << endl;
+    cout << "Enter the initial direction (W - west, N - north, S - south, E - east)" << endl;
     cin >> c;
     cout << "Enter the command (0 - continue driving, 1 - turn left, -1 - turn right)" << endl;
     cin >> n;
     switch (c) {
-    case 'С':
+    case 'N':
         switch (n) {
         case 1:
-            c = 'З';
+            c = 'W';
             break;
         case 0:
-            c = 'С';
+            c = 'N';
             break;
         case -1:
-            c = 'В';
+            c = 'E';
             break;
         }
         break;
     case 'В':
         switch (n) {
         case 1:
-            c = 'С';
+            c = 'N';
             break;
         case 0:
-            c = 'В';
+            c = 'E';
             break;
         case -1:
-            c = 'Ю';
+            c = 'S';
             break;
         }
-    case 'Ю':
+    case 'S':
         switch (n) {
         case 1:
-            c = 'В';
+            c = 'E';
             break;
         case 0:
-            c = 'Ю';
+            c = 'S';
             break;
         case -1:
-            c = 'З';
+            c = 'W';
             break;
         }
         break;
-    case 'З':
+    case 'W':
         switch (n) {
         case 1:
-            c = 'Ю';
+            c = 'S';
             break;
         case 0:
-            c = 'З';
+            c = 'W';
             break;
         case -1:
-            c = 'С';
+            c = 'N';
             break;
         }
     }
