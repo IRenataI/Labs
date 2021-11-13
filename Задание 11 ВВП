@@ -59,24 +59,40 @@ int main()
 
 	cout << "=================================================" << endl;
 
-	cout << "Введите точку A" << endl;
-	cin >> A;
-	cout << "Введите точку B" << endl;
-	cin >> B;
-	cout << "Введите точку C" << endl;
-	cin >> C;
+		int Ax, Ay, Bx, By, Cx, Cy;
 
-	if (abs(A - B) < abs(A - C))
+	cout << "Введите точку A (x)" << endl;
+	cin >> Ax;
+	cout << "Введите точку A (y)" << endl;
+	cin >> Ay;
+	cout << "Введите точку B (x)" << endl;
+	cin >> Bx;
+	cout << "Введите точку B (y)" << endl;
+	cin >> By;
+	cout << "Введите точку C (x)" << endl;
+	cin >> Cx;
+	cout << "Введите точку C (y)" << endl;
+	cin >> Cy;
+	
+	double AB, AC;
+
+	AB = sqrt(((Bx - Ax) * (Bx - Ax)) + ((By - Ay) * (By - Ay)));
+	AC = sqrt(((Cx - Ax) * (Cx - Ax)) + ((Cy - Ay) * (Cy - Ay)));
+
+	if (AB > AC)
 	{
-		cout << "Точка B расположена ближе к точке A" << endl;
+		cout << "Точка C расположена ближе к точке A" << endl;
+		cout << AC << endl;
 	}
-	else if (abs(A - B) == abs(A - C))
+	else if (AB == AC)
 	{
 		cout << "Точки B и C равноудалены от точки A" << endl;
+		cout << AC << endl;
 	}
 	else
 	{
-		cout << "Точка C расположена ближе к точке A" << endl;
+		cout << "Точка B расположена ближе к точке A" << endl;
+		cout << AB << endl;
 	}
 
 	//Задание 4
