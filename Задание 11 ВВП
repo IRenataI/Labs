@@ -82,17 +82,17 @@ int main()
 	if (AB > AC)
 	{
 		cout << "Точка C расположена ближе к точке A" << endl;
-		cout << AC << endl;
+		cout << "Расстояние = " << AC << endl;
 	}
 	else if (AB == AC)
 	{
 		cout << "Точки B и C равноудалены от точки A" << endl;
-		cout << AC << endl;
+		cout << "Расстояние = " << AC << endl;
 	}
 	else
 	{
 		cout << "Точка B расположена ближе к точке A" << endl;
-		cout << AB << endl;
+		cout << "Расстояние = " << AB << endl;
 	}
 
 	//Задание 4
