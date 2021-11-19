@@ -64,7 +64,7 @@ int main()
 	//Задание 3
 
 	cout << "=================================================" << endl;
-	
+
 	int B;
 
 	cout << "Введите размер массива N (N>2)" << endl;
@@ -146,53 +146,30 @@ int main()
 
 	int* AAA = new int[N];
 
-	for (int i = 0; i < N; i++)
+	cout <<  "Вывод массива" << endl;
+
+	for (int i = 0; i <= N; i++)
 	{
 		AAA[i] = rand() % 90 + 10;
-	}
-
-	cout << "Вывод массива" << endl;
-
-	for (int i = 0; i < N; i++)
-	{
 		cout << AAA[i] << endl;
+
 	}
 
-	const float k = 1.247;
+	cout << endl;
 
+	cout << "Элементы с нечетными номерами в порядке возрастания номеров" << endl;
 
-	for (int i = N - 1; i >= 1; i = i / k)
+	for (int i = 1; i < N; i+=2)
 	{
-		for (int j = 0; j < N - i; j++)
-		{
-			if (AAA[j] > AAA[j + i])
-			{
-				swap(AAA[j], AAA[j + i]);
-			}
-		}
+		cout << i << "- " << AAA[i] << endl;
 	}
 
-	cout << "Элементы с нечетными номерами в порядке возрастания номеров:" << endl;
-
-	for (int i = 0; i < N; i++)
+	cout << "Элементы с четными номерами в порядке убывания номеров" << endl;
+     
+	for (int i = N - (N % 2); i >= 0; i -= 2)
 	{
-		if (AAA[i] % 2 != 0)
-		{
-			cout << AAA[i] << " ";
-		}
+		cout << i << "- " << AAA[i] << endl;
 	}
 
-	cout << "\n";
-	cout << "Элементы с четными номерами в порядке убывания номеров:" << endl;
-
-
-	for (int i = N; i >= 0; i--)
-	{
-		if (AAA[i] % 2 == 0)
-		{
-			cout << AAA[i] << " ";
-		}
-	}
-
-	delete[] AAA;
+	return 0;
 }
