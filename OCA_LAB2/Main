@@ -1,0 +1,449 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include "Database.cpp"
+
+struct Date
+{
+    int day;
+    int month;
+    int year;
+};
+
+struct MyMegaCoolStructure : Data
+{
+    char ExamName[50];
+    Date ExamDate;
+    char ProfessorName[50];
+    int MarksCount = 0;
+    int* Marks = new int [MarksCount];
+
+};
+
+
+int CheckMenuNumber;
+void Menu()
+{
+    std::cout << " Select action: \n" << "\t1) Data entry\n" << "\t2) Data output\n" << "\t3) Data saving\n" <<
+        "\t4) Data search\n" << "\t5) Data sorting\n" << "\t6) Delete data\n" << "\t7) Restore data\n" << "\t0) Output\n" << std::endl;
+    std::cin >> CheckMenuNumber;
+}
+
+int main() {
+    int dbSize = 10;
+    std::string dbName = "myCoolDatabase.bin";
+
+    Database<MyMegaCoolStructure>* database = new Database<MyMegaCoolStructure>(dbName, dbSize);
+
+    Menu();
+    while (CheckMenuNumber != 0)
+    {
+        switch (CheckMenuNumber)
+        {
+        case 1:
+        {
+            system("cls");
+            int count;
+            std::cout << "Data count: "; std::cin >> count;
+            for (int i = 0; i < count; i++)
+            {
+                MyMegaCoolStructure structure;
+                std::cout << "Exam Name: "; std::cin >> structure.ExamName;
+                std::cout << "Exam date (d m y): "; std::cin >> structure.ExamDate.day >> structure.ExamDate.month >> structure.ExamDate.year;
+                std::cout << "Professor's Name: "; std::cin >> structure.ProfessorName;
+                std::cout << "Marks Count: "; std::cin >> structure.MarksCount;
+                for (int j = 0; j < structure.MarksCount; j++)
+                {
+                    std::cout << "Mark " << j + 1 << ":"; std::cin >> structure.Marks[j];
+                }
+                database->Add(i, structure);
+                std::cout << "Added! " << std::endl;
+            }
+            system("pause");
+            system("cls");
+            Menu();
+        }
+            break;
+        case 2:
+        {
+            std::vector<MyMegaCoolStructure> all = database->GetAll();
+            for (size_t i = 0; i < all.size(); i++)
+            {
+                std::cout << "Exam Name: " << all[i].ExamName << "\nDate: " << all[i].ExamDate.day << "/" << all[i].ExamDate.month << "/"
+                    << all[i].ExamDate.year << "\nProfessor's Name: " << all[i].ProfessorName << "\nMarks Count: " << all[i].MarksCount << std::endl;
+                for (int j = 0; j < all[i].MarksCount; j++)
+                {
+                    std::cout << "Mark " << j + 1 << ": " << all[i].Marks[j] << std::endl;
+                }
+            }
+            system("pause");
+            system("cls");
+            Menu();
+        }
+            break;
+        case 3:
+        {
+            database->Save();
+            std::cout << "Saved! " << std::endl;
+            system("pause");
+            system("cls");
+            Menu();
+        }
+            break;
+        case 4:
+        {
+            int check;
+            std::cout << " Select action: \n" << "\t1) Find by close count/name\n" << "\t2) Find min\n" << "\t3) Find max\n" << std::endl;
+            std::cin >> check;
+            if (check == 1)
+            {
+                std::cout << " Select action: \n" << "\t1) Find by exam name\n" << "\t2) Find by Professor;s name\n" << "\t3) Find by date\n" <<
+                    "\t4) Find by marks count\n" << std::endl;
+                std::cin >> check;
+
+                if (check == 1)
+                {
+                    std::string name;
+                    std::cout << "Exam Name to search: "; std::cin >> name;
+                    MyMegaCoolStructure* resByStr = database->FindNearestString([](MyMegaCoolStructure p) { return std::string(p.ExamName); }, name);
+                    if (resByStr == NULL)
+                        std::cout << "NotFound!" << std::endl;
+                    else
+                    {
+                        std::cout << "Exam Name: " << resByStr->ExamName << "\nDate: " << resByStr->ExamDate.day << "/" << resByStr->ExamDate.month << "/"
+                            << resByStr->ExamDate.year << "\nProfessor's Name: " << resByStr->ProfessorName << "\nMarks Count: " << resByStr->MarksCount << std::endl;
+                        for (int j = 0; j < resByStr->MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << resByStr->Marks[j] << std::endl;
+                        }
+                    }
+                }
+                else if (check == 2)
+                {
+                    std::string name;
+                    std::cout << "Professor's name to search: "; std::cin >> name;
+                    MyMegaCoolStructure* resByStr = database->FindNearestString([](MyMegaCoolStructure p) { return std::string(p.ProfessorName); }, name);
+                    if (resByStr == NULL)
+                        std::cout << "NotFound!" << std::endl;
+                    else
+                    {
+                        std::cout << "Professor's name: " << resByStr->ExamName << "\nDate: " << resByStr->ExamDate.day << "/" << resByStr->ExamDate.month << "/"
+                            << resByStr->ExamDate.year << "\nProfessor's Name: " << resByStr->ProfessorName << "\nMarks Count: " << resByStr->MarksCount << std::endl;
+                        for (int j = 0; j < resByStr->MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << resByStr->Marks[j] << std::endl;
+                        }
+                    }
+                }
+                else if (check == 3)
+                {
+                    int DateToSearch, day, month, year;
+                    std::cout << "Day to search: "; std::cin >> day;
+                    std::cout << "Month to search: "; std::cin >> month;
+                    std::cout << "Year to search: "; std::cin >> year;
+                    DateToSearch = day + month * 30 + year * 365;
+                    MyMegaCoolStructure* resByInt = database->FindNearestInt([](MyMegaCoolStructure p) { return p.ExamDate.day + p.ExamDate.month*30 + p.ExamDate.year*365; }, DateToSearch);
+                    if (resByInt == NULL)
+                        std::cout << "NotFound!" << std::endl;
+                    else
+                    {
+                        std::cout << "Date: " << resByInt->ExamName << "\nDate: " << resByInt->ExamDate.day << "/" << resByInt->ExamDate.month << "/"
+                            << resByInt->ExamDate.year << "\nProfessor's Name: " << resByInt->ProfessorName << "\nMarks Count: " << resByInt->MarksCount << std::endl;
+                        for (int j = 0; j < resByInt->MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << resByInt->Marks[j] << std::endl;
+                        }
+                    }
+                }
+                else if (check == 4)
+                {
+                    int MarksCountToSearch;
+                    std::cout << "Marks count to search: "; std::cin >> MarksCountToSearch;
+                    MyMegaCoolStructure* resByInt = database->FindNearestInt([](MyMegaCoolStructure p) { return p.MarksCount; }, MarksCountToSearch);
+                    if (resByInt == NULL)
+                        std::cout << "NotFound!" << std::endl;
+                    else
+                    {
+                        std::cout << "Marks count: " << resByInt->ExamName << "\nDate: " << resByInt->ExamDate.day << "/" << resByInt->ExamDate.month << "/"
+                            << resByInt->ExamDate.year << "\nProfessor's Name: " << resByInt->ProfessorName << "\nMarks Count: " << resByInt->MarksCount << std::endl;
+                        for (int j = 0; j < resByInt->MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << resByInt->Marks[j] << std::endl;
+                        }
+                    }
+                }
+            }
+            else if (check == 2)
+            {
+                std::cout << " Select action: \n" << "\t1) Find by exam name\n" << "\t2) Find by Professor's name\n" << "\t3) Find by day\n" <<
+                    "\t4) Find by marks count\n" << std::endl;
+                std::cin >> check;
+                if (check == 1)
+                {
+                    MyMegaCoolStructure* minByName = database->FindMin<std::string>([](MyMegaCoolStructure p) { return std::string(p.ExamName); });
+                    std::cout << "Min by Exam Name: " << minByName->ExamName << "\nDate: " << minByName->ExamDate.day << "/" << minByName->ExamDate.month << "/"
+                        << minByName->ExamDate.year << "\nProfessor's Name: " << minByName->ProfessorName << "\nMarks Count: " << minByName->MarksCount << std::endl;
+                    for (int j = 0; j < minByName->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << minByName->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 2)
+                {
+                    MyMegaCoolStructure* minByName = database->FindMin<std::string>([](MyMegaCoolStructure p) { return std::string(p.ProfessorName); });
+                    std::cout << "Min by Professor's Name: " << minByName->ExamName << "\nDate: " << minByName->ExamDate.day << "/" << minByName->ExamDate.month << "/"
+                        << minByName->ExamDate.year << "\nProfessor's Name: " << minByName->ProfessorName << "\nMarks Count: " << minByName->MarksCount << std::endl;
+                    for (int j = 0; j < minByName->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << minByName->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 3)
+                {
+                    MyMegaCoolStructure* minByCount = database->FindMin<int>([](MyMegaCoolStructure p) { return p.ExamDate.day; });
+                    std::cout << "Min by Exam Day: " << minByCount->ExamName << "\nDate: " << minByCount->ExamDate.day << "/" << minByCount->ExamDate.month << "/"
+                        << minByCount->ExamDate.year << "\nProfessor's Name: " << minByCount->ProfessorName << "\nMarks Count: " << minByCount->MarksCount << std::endl;
+                    for (int j = 0; j < minByCount->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << minByCount->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 4)
+                {
+                    MyMegaCoolStructure* minByCount = database->FindMin<int>([](MyMegaCoolStructure p) { return p.MarksCount; });
+                    std::cout << "Min by Marks Count: " << minByCount->ExamName << "\nDate: " << minByCount->ExamDate.day << "/" << minByCount->ExamDate.month << "/"
+                        << minByCount->ExamDate.year << "\nProfessor's Name: " << minByCount->ProfessorName << "\nMarks Count: " << minByCount->MarksCount << std::endl;
+                    for (int j = 0; j < minByCount->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << minByCount->Marks[j] << std::endl;
+                    }
+                }
+            }
+            else if (check == 3)
+            {
+                std::cout << " Select action: \n" << "\t1) Find by exam name\n" << "\t2) Find by Professor's name\n" << "\t3) Find by day\n" <<
+                    "\t4) Find by marks count\n" << std::endl;
+                std::cin >> check;
+                if (check == 1)
+                {
+                    MyMegaCoolStructure* maxByName = database->FindMax<std::string>([](MyMegaCoolStructure p) { return std::string(p.ExamName); });
+                    std::cout << "Max by Exam Name: " << maxByName->ExamName << "\nDate: " << maxByName->ExamDate.day << "/" << maxByName->ExamDate.month << "/"
+                        << maxByName->ExamDate.year << "\nProfessor's Name: " << maxByName->ProfessorName << "\nMarks Count: " << maxByName->MarksCount << std::endl;
+                    for (int j = 0; j < maxByName->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << maxByName->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 2)
+                {
+                    MyMegaCoolStructure* maxByName = database->FindMax<std::string>([](MyMegaCoolStructure p) { return std::string(p.ProfessorName); });
+                    std::cout << "Max by Professor's Name: " << maxByName->ExamName << "\nDate: " << maxByName->ExamDate.day << "/" << maxByName->ExamDate.month << "/"
+                        << maxByName->ExamDate.year << "\nProfessor's Name: " << maxByName->ProfessorName << "\nMarks Count: " << maxByName->MarksCount << std::endl;
+                    for (int j = 0; j < maxByName->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << maxByName->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 3)
+                {
+                    MyMegaCoolStructure* maxByCount = database->FindMax<int>([](MyMegaCoolStructure p) { return p.ExamDate.day; });
+                    std::cout << "Max by Exam day: " << maxByCount->ExamName << "\nDate: " << maxByCount->ExamDate.day << "/" << maxByCount->ExamDate.month << "/"
+                        << maxByCount->ExamDate.year << "\nProfessor's Name: " << maxByCount->ProfessorName << "\nMarks Count: " << maxByCount->MarksCount << std::endl;
+                    for (int j = 0; j < maxByCount->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << maxByCount->Marks[j] << std::endl;
+                    }
+                }
+                else if (check == 4)
+                {
+                    MyMegaCoolStructure* maxByCount = database->FindMax<int>([](MyMegaCoolStructure p) { return p.MarksCount; });
+                    std::cout << "Max by Marks Count: " << maxByCount->ExamName << "\nDate: " << maxByCount->ExamDate.day << "/" << maxByCount->ExamDate.month << "/"
+                        << maxByCount->ExamDate.year << "\nProfessor's Name: " << maxByCount->ProfessorName << "\nMarks Count: " << maxByCount->MarksCount << std::endl;
+                    for (int j = 0; j < maxByCount->MarksCount; j++)
+                    {
+                        std::cout << "Mark " << j + 1 << ": " << maxByCount->Marks[j] << std::endl;
+                    }
+                }
+            }
+            system("pause");
+            system("cls");
+            Menu();
+        }
+            break;
+        case 5:
+        {
+            int check;
+            std::cout << " Select action: \n" << "\t1) Sort in ascending order\n" << "\t2) Sort in descending order\n" << std::endl;
+            std::cin >> check;
+            if (check == 1)
+            {
+                std::cout << " Select action: \n" << "\t1) Sort by Exam Name\n" << "\t2) Sort by Professor's name\n" 
+                    << "\t3) Sort by date\n" << "\t2) Sort by marks count\n" << std::endl;
+                std::cin >> check;
+                if (check == 1)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return std::string(p1.ExamName) > std::string(p2.ExamName); });
+                    std::cout << "Sorted by Exam Name asc: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+                        
+                }
+                else if (check == 2)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return std::string(p1.ProfessorName) > std::string(p2.ProfessorName); });
+                    std::cout << "Sorted by Professor's Name asc: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+                else if (check == 3)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return p1.ExamDate.day + p1.ExamDate.month * 30 + p1.ExamDate.year * 365 > p2.ExamDate.day + p2.ExamDate.month * 30 + p2.ExamDate.year * 365; });
+                    std::cout << "Sorted by date asc: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+                else if (check == 4)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return p1.MarksCount > p2.MarksCount; });
+                    std::cout << "Sorted by Marks Count asc: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+            }
+            else if (check == 2)
+            {
+                std::cout << " Select action: \n" << "\t1) Sort by Exam Name\n" << "\t2) Sort by Professor's name\n"
+                    << "\t3) Sort by date\n" << "\t2) Sort by marks count\n" << std::endl;
+                std::cin >> check;
+                if (check == 1)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return std::string(p1.ExamName) < std::string(p2.ExamName); });
+                    std::cout << "Sorted by Exam Name decs: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+                else if (check == 2)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return std::string(p1.ProfessorName) < std::string(p2.ProfessorName); });
+                    std::cout << "Sorted by Professor's Name decs: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+                else if (check == 3)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return p1.ExamDate.day + p1.ExamDate.month * 30 + p1.ExamDate.year * 365 < p2.ExamDate.day + p2.ExamDate.month * 30 + p2.ExamDate.year * 365; });
+                    std::cout << "Sorted by date decs: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+                else if (check == 4)
+                {
+                    database->SortBy([](MyMegaCoolStructure p1, MyMegaCoolStructure p2) { return p1.MarksCount < p2.MarksCount; });
+                    std::cout << "Sorted by Marks Count decs: " << std::endl;
+                    std::vector<MyMegaCoolStructure> allAfterSortByName = database->GetAll();
+                    for (size_t i = 0; i < allAfterSortByName.size(); i++)
+                    {
+                        std::cout << allAfterSortByName[i].ExamName << "\nDate: " << allAfterSortByName[i].ExamDate.day << "/" << allAfterSortByName[i].ExamDate.month << "/"
+                            << allAfterSortByName[i].ExamDate.year << "\nProfessor's Name: " << allAfterSortByName[i].ProfessorName << "\nMarks Count: " << allAfterSortByName[i].MarksCount << std::endl;
+                        for (int j = 0; j < allAfterSortByName[i].MarksCount; j++)
+                        {
+                            std::cout << "Mark " << j + 1 << ": " << allAfterSortByName[i].Marks[j] << std::endl;
+                        }
+                    }
+
+                }
+            }
+            system("pause");
+            system("cls");
+            Menu();
+        }
+        break;
+        case 6:
+        {
+            delete database;
+            database = new Database<MyMegaCoolStructure>(dbName, dbSize);
+            std::cout << "Deleted!" << std::endl;
+            system("pause");
+            system("cls");
+            Menu();
+        }
+        break;
+        case 7:
+        {
+            database->Restore();
+            std::cout << "Restored!" << std::endl;
+            system("pause");
+            system("cls");
+            Menu();
+        }
+        break;
+        }
+
+
+    }
+
+    return 0;
+}
