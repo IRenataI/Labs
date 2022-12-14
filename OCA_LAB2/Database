@@ -1,0 +1,159 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <type_traits> 
+#include <string>
+#include <vector>
+#include <cmath>
+#include <stdlib.h>
+
+
+struct Data
+{
+    bool IsDeleted = false;
+};
+
+template<typename TStruct, typename = std::enable_if<std::is_base_of<Data, TStruct>::value>>
+class Database
+{
+private:
+    TStruct* _dataArray;
+    long _databaseSize;
+    char* _databaseName;
+
+    void swap(TStruct* xp, TStruct* yp)
+    {
+        TStruct temp = *xp;
+        *xp = *yp;
+        *yp = temp;
+    }
+
+public:
+    Database(std::string databaseName, long length) {
+        _databaseName = new char[databaseName.length() + 1];
+        strcpy(_databaseName, databaseName.c_str());
+
+        _dataArray = new TStruct[length];
+        _databaseSize = length;
+
+        for (size_t i = 0; i < _databaseSize; i++)
+            _dataArray[i].IsDeleted = true;
+    }
+
+    ~Database() {
+        delete[] _dataArray;
+    }
+
+    void Delete(int index) {
+        _dataArray[index].IsDeleted = true;
+    }
+
+    int FindEmpty() {
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (_dataArray[i].IsDeleted)
+                return i;
+
+        return -1;
+    }
+
+    void Add(int index, TStruct data) {
+        _dataArray[index] = data;
+        _dataArray[index].IsDeleted = false;
+    }
+
+    TStruct Get(int index) {
+        return _dataArray[index];
+    }
+
+    std::vector<TStruct> GetAll() {
+        std::vector<TStruct> result;
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (!_dataArray[i].IsDeleted)
+                result.push_back(_dataArray[i]);
+        return result;
+    }
+
+    TStruct* FindNearestInt(int (*selectorFunction)(TStruct), int searchElement) {
+        int indexOfNearestElement = -1;
+        int minimalDiff = INT_MAX;
+
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (!_dataArray[i].IsDeleted) {
+                int valueDiff = abs(selectorFunction(_dataArray[i]) - searchElement);
+
+                if (valueDiff < minimalDiff) {
+                    minimalDiff = valueDiff;
+                    indexOfNearestElement = i;
+                }
+            }
+
+        return indexOfNearestElement == -1 ? (TStruct*)NULL : &_dataArray[indexOfNearestElement];
+    }
+
+    TStruct* FindNearestString(std::string(*selectorFunction)(TStruct), std::string searchElement) {
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (!_dataArray[i].IsDeleted && selectorFunction(_dataArray[i]).find(searchElement) != std::string::npos)
+                return &_dataArray[i];
+        return NULL;
+    }
+
+
+    TStruct* FindNearestString(int fieldIndex, std::string searchElement);
+    TStruct* FindNearestMarksCount(int fieldIndex, int searchElement);
+
+   
+    template<typename TValue>
+    TStruct* FindMin(TValue(*selectorFunction)(TStruct)) {
+        TValue min = selectorFunction(_dataArray[0]);
+        int indexOfMinElement = -1;
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (!_dataArray[i].IsDeleted && selectorFunction(_dataArray[i]) <= min)
+            {
+                indexOfMinElement = i;
+                min = selectorFunction(_dataArray[i]);
+            }
+
+        return indexOfMinElement == -1 ? (TStruct*)NULL : &_dataArray[indexOfMinElement];
+    }
+
+    TStruct* FindMin(int fieldNumber);
+
+    template<typename TValue>
+    TStruct* FindMax(TValue(*selectorFunction)(TStruct)) {
+        TValue max = selectorFunction(_dataArray[0]);
+        int indexOfMaxElement = -1;
+        for (size_t i = 0; i < _databaseSize; i++)
+            if (!_dataArray[i].IsDeleted && selectorFunction(_dataArray[i]) >= max)
+            {
+                indexOfMaxElement = i;
+                max = selectorFunction(_dataArray[i]);
+            }
+
+        return indexOfMaxElement == -1 ? (TStruct*)NULL : &_dataArray[indexOfMaxElement];
+    }
+
+    TStruct* FindMax(int fieldNumber);
+    
+    void SortBy(bool (*f)(TStruct, TStruct)) {
+        for (int i = 0; i < _databaseSize - 1; i++)
+            for (int j = 0; j < _databaseSize - i - 1; j++)
+                if (f(_dataArray[j], _dataArray[j + 1]))
+                    swap(&_dataArray[j], &_dataArray[j + 1]);
+    }
+
+    void Restore() {
+        FILE* file = fopen(_databaseName, "rb");
+
+        for (size_t i = 0; i < _databaseSize; i++)
+            fread(&_dataArray[i], sizeof(TStruct), 1, file);
+
+        fclose(file);
+    }
+
+    void Save() {
+        FILE* file = fopen(_databaseName, "wb");
+
+        for (size_t i = 0; i < _databaseSize; i++)
+            fwrite(&_dataArray[i], sizeof(TStruct), 1, file);
+
+        fclose(file);
+    }
+};
