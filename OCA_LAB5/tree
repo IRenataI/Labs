@@ -1,0 +1,359 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <cassert>
+#include <vector>
+using namespace std;
+
+class Tree
+{
+private:
+	struct Branch
+	{
+		int Data;
+		Branch* LeftBranch;
+		Branch* RightBranch;
+	};
+
+	Branch* root;
+
+
+	int tabs = 0;
+	int tabs2 = 0;
+
+
+	void Add(int aData, Branch*& aBranch)
+	{
+		if (!aBranch)
+		{
+			aBranch = new Branch;
+			aBranch->Data = aData;
+			aBranch->LeftBranch = 0;
+			aBranch->RightBranch = 0;
+			return;
+		}
+		else
+			if (aBranch->Data > aData)
+			{
+				Add(aData, aBranch->LeftBranch);
+			}
+			else
+			{
+				Add(aData, aBranch->RightBranch);
+			};
+	}
+
+
+
+	void save_tree_in_file(Branch* aBranch, ofstream& out)
+	{
+		if (!aBranch) {
+			return;
+		}
+		else {
+			tabs2 += 5;
+			save_tree_in_file(aBranch->LeftBranch, out);
+			for (int i = 0; i < tabs2; i++) out << " ";
+			out << aBranch->Data << "\n";
+			save_tree_in_file(aBranch->RightBranch, out);
+			tabs2 -= 5;
+		}
+	}
+
+
+	void save_obh_in_file(Branch* aBranch, ofstream& out)
+	{
+		if (!aBranch) {
+			return;
+		}
+		else {
+			out << aBranch->Data << "\n";
+			save_obh_in_file(aBranch->LeftBranch, out);
+			save_obh_in_file(aBranch->RightBranch, out);
+		}
+	}
+
+
+	void print(Branch* aBranch)
+	{
+		if (!aBranch) return;
+		tabs += 5;
+
+		print(aBranch->LeftBranch);
+
+		for (int i = 0; i < tabs; i++) cout << " ";
+		cout << aBranch->Data << endl;
+
+
+		print(aBranch->RightBranch);
+
+		tabs -= 5;
+		return;
+	}
+
+	void pr_obh(Branch*& aBranch, vector<int>* result)
+	{
+		if (NULL == aBranch)    return;
+
+		result->push_back(aBranch->Data);
+		pr_obh(aBranch->LeftBranch, result);
+		pr_obh(aBranch->RightBranch, result);
+	}
+
+
+	int find_elem(Branch* aBranch, int find)
+	{
+		if (NULL == aBranch)
+			return -1;
+		if (aBranch->Data == find)
+			return aBranch->Data;
+		if (find < aBranch->Data)
+			return find_elem(aBranch->LeftBranch, find);
+		else if (find > aBranch->Data)
+			return find_elem(aBranch->RightBranch, find);
+	}
+
+	void FreeTree(Branch* aBranch)
+	{
+		if (!aBranch) return;
+		FreeTree(aBranch->LeftBranch);
+		FreeTree(aBranch->RightBranch);
+		delete aBranch;
+		return;
+	}
+
+	int Delete(int item)
+	{
+		struct Branch* node, ** nee;
+		assert(this != NULL);
+		nee = &root;
+		node = root;
+		for (;;) {
+			if (node == NULL)
+				return NULL;
+			else if (item == node->Data)
+				break;
+			else if (item > node->Data) {
+				nee = &node->RightBranch;
+				node = node->RightBranch;
+			}
+			else {
+				nee = &node->LeftBranch;
+				node = node->LeftBranch;
+			}
+		}
+		if (node->RightBranch == NULL)
+			*nee = node->LeftBranch;
+		else {
+			struct Branch* y = node->RightBranch;
+			if (y->LeftBranch == NULL) {
+				y->LeftBranch = node->LeftBranch;
+				*nee = y;
+			}
+			else {
+				struct Branch* x = y->LeftBranch;
+				while (x->LeftBranch != NULL) {
+					y = x;
+					x = y->LeftBranch;
+				}
+				y->LeftBranch = x->RightBranch;
+				x->LeftBranch = node->LeftBranch;
+				x->RightBranch = node->RightBranch;
+				*nee = x;
+			}
+		}
+		free(node);
+		return 1;
+	}
+
+public:
+	void Add(int aData) {
+		Add(aData, root);
+	}
+
+	void save_tree_in_file(ofstream& out) {
+		save_tree_in_file(root, out);
+	}
+
+	void save_obh_in_file(ofstream& out) {
+		save_obh_in_file(root, out);
+	}
+
+	void print() {
+		print(root);
+	}
+
+	vector<int> bypass() {
+		vector<int> result;
+		pr_obh(root, &result);
+		return result;
+	}
+
+
+	int find_elem(int find) {
+		return find_elem(root, find);
+	}
+
+	void FreeTree() {
+		FreeTree(root);
+	}
+
+	int Del(int aData)
+	{
+		return Delete(aData);
+	}
+
+};
+
+int check_menu;
+
+void Menu()
+{
+	cout << "Выберите действие:" << "\n1) Добавить элемент" << "\n2) Удалить элемент" << "\n3) Сделать обход" << "\n4) Найти элемент" << "\n0) Выход" << endl;
+	cin >> check_menu;
+}
+
+
+int main()
+{
+
+	setlocale(LC_ALL, "rus");
+
+	ofstream fout;
+	fout.open("Tree.txt");
+
+	Tree tree;
+
+	int count;
+	int element;
+	int k;
+
+	cout << "Введите кол-во элементов для будущего дерева: ";
+	cin >> count;
+	cout << endl;
+
+	for (int i = 0; i < count; i++)
+	{
+		tree.Add(rand() % 100);
+	}
+
+	cout << "Вывод бинарного дерева: " << endl;
+	tree.print();
+
+	cout << "Сохранение дерева в файл..." << endl;
+	fout << "Бинарное дерево:" << "\n";
+	tree.save_tree_in_file(fout);
+
+	cout << "Прямой обход бинарного дерева: " << endl;
+	vector<int> result = tree.bypass();
+	for (size_t i = 0; i < result.size(); i++)
+	{
+		cout << result[i] << endl;
+	}
+
+	cout << endl;
+
+	cout << "Сохранение прямого обхода в файл..." << endl << endl;
+	fout << "Прямой обход бинарного дерева:" << "\n";
+	tree.save_obh_in_file(fout);
+
+	Menu();
+	while (check_menu != 0)
+	{
+		if (check_menu == 1)
+		{
+			cout << "Добавим новый элемент в бинарное дерево" << endl;
+			cout << "Введите новый элемент: ";
+			cin >> element;
+			tree.Add(element);
+
+			cout << "Вывод бинарного дерева: " << endl;
+			tree.print();
+
+			int check = 0;
+			cout << "Записать новое дерево в файл? " << "\n1) Да" << "\n2) Нет" << endl;
+			cin >> check;
+
+			if (check == 1)
+			{
+				cout << "Сохранение дерева в файл..." << endl;
+				fout << "Новое бинарное дерево:" << "\n";
+				tree.save_tree_in_file(fout);
+			}
+			system("pause");
+			system("cls");
+			Menu();
+		}
+		else if (check_menu == 2)
+		{
+			cout << "Удалим элемент из бинарного дерева" << endl;
+			cout << "Введите элемент, который хотите удалить: ";
+			cin >> element;
+			tree.Del(element);
+
+			cout << "Вывод бинарного дерева: " << endl;
+			tree.print();
+			cout << endl;
+			int check = 0;
+			cout << "Записать новое дерево в файл? " << "\n1) Да" << "\n2) Нет" << endl;
+			cin >> check;
+			if (check == 1)
+			{
+				cout << "Сохранение дерева в файл..." << endl;
+				fout << "Новое бинарное дерево:" << "\n";
+				tree.save_tree_in_file(fout);
+			}
+			system("pause");
+			system("cls");
+			Menu();
+		}
+		else if (check_menu == 3)
+		{
+			cout << "Прямой обход бинарного дерева: " << endl;
+			vector<int> result = tree.bypass();
+			for (size_t i = 0; i < result.size(); i++)
+			{
+				cout << result[i];
+			}
+			cout << endl;
+
+			int check = 0;
+			cout << "Записать новый обход в файл? " << "\n1) Да" << "\n2) Нет" << endl;
+			cin >> check;
+			if (check == 1)
+			{
+				cout << "Сохранение прямого обхода в файл..." << endl;
+				fout << "Новый прямой обход бинарного дерева:" << "\n";
+				tree.save_obh_in_file(fout);
+			}
+			system("pause");
+			system("cls");
+			Menu();
+		}
+		else if (check_menu == 4)
+		{
+			int findel;
+			cout << "Введите элемент, который нужно найти " << endl;
+			cin >> findel;
+			if (tree.find_elem(findel) == -1)
+			{
+				cout << "Элемент не найден!" << endl;
+			}
+			else
+			{
+				cout << "Элемент " << tree.find_elem(findel) << " найден!" << endl;
+			}
+			system("pause");
+			system("cls");
+			Menu();
+		}
+	}
+
+	tree.FreeTree();
+	cout << "Вся динамическая память очищена!" << endl;
+
+	fout.close();
+
+	return 0;
+}
